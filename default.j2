@@ -1,0 +1,36 @@
+server {
+    listen       8091;
+    server_name  localhost xhpfm.mobile.zhongguowangshi.com xhpfm.temp.zhongguowangshi.com;
+    charset utf-8;
+     root   /var/www/xhpfm.mobile.zhongguowangshi.com_new/public;
+
+    location / {
+        index  index.php index.html index.htm;
+	try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+	try_files $uri /index.php = 404;
+	include        fastcgi_params;
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+    }
+
+
+	location  /fpm-status {
+			include        fastcgi_params;
+			fastcgi_pass   127.0.0.1:9000;
+			fastcgi_index  index.php;
+			fastcgi_param  SCRIPT_FILENAME  $fastcgi_script_name;
+	}
+
+    access_log  /alidata1/log/zhongguowangshi_new.log;
+}
+server {
+        listen 801;
+        stub_status on;
+        access_log   off;
+        allow 127.0.0.1;
+        deny all;
+}

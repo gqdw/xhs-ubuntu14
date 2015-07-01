@@ -1,0 +1,32 @@
+---
+- hosts: production
+  remote_user: root
+  vars:
+    max_children: 256
+# #    eth0ip: "{{ansible_eth0.ipv4.address}}"
+# #  sudo: yes
+  tasks: 
+    - name: install php5-fpm nginx 
+      apt: name={{ item }} state=installed update_cache=yes cache_valid_time=3600
+      with_items:
+        - php5-fpm
+        - php5-dev
+        - php5-mcrypt
+        - php5-memcached
+        - php5-sasl
+        - nginx
+
+    - name: configure php5-fpm 
+      template: src=www.j2 dest=/etc/php5/fpm/pool.d/www.conf
+      notify: restart php5-fpm
+
+    - name: configure nginx vhost
+      copy: src=default.j2 dest=/etc/nginx/sites-enabled/default
+      notify: restart nginx
+
+
+  handlers:
+    - name: restart php5-fpm
+      command: /usr/sbin/service php5-fpm restart
+    - name: restart nginx
+      service: name=nginx state=restarted
